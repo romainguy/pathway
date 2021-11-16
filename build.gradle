@@ -1,0 +1,87 @@
+import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:7.0.3"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31"
+        classpath "com.vanniktech:gradle-maven-publish-plugin:0.18.0"
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.5.0"
+    }
+
+    ext.cppFlags = [
+        "-std=c++17",
+        "-Wno-unused-command-line-argument",
+        "-Wl,--hash-style=both", // Required to support API levels below 23
+        "-fno-stack-protector",
+        "-fno-exceptions",
+        "-fno-unwind-tables",
+        "-fno-asynchronous-unwind-tables",
+        "-fno-rtti",
+        "-ffast-math",
+        "-ffp-contract=fast",
+        "-fvisibility-inlines-hidden",
+        "-fvisibility=hidden",
+        "-fomit-frame-pointer",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wl,--gc-sections",
+        "-Wl,-Bsymbolic-functions",
+    ]
+}
+
+apply plugin: 'org.jetbrains.dokka'
+
+tasks.withType(DokkaMultiModuleTask).configureEach {
+    outputDirectory = rootProject.file('docs/api')
+    failOnWarning = true
+}
+
+afterEvaluate {
+    if (tasks.findByName('dokkaHtmlPartial') == null) {
+        // If dokka isn't enabled on this module, skip
+        return
+    }
+
+    tasks.named('dokkaHtmlPartial') {
+        dokkaSourceSets.configureEach {
+            reportUndocumented.set(true)
+            skipEmptyPackages.set(true)
+            skipDeprecated.set(true)
+            jdkVersion.set(8)
+
+            // Add Android SDK packages
+            noAndroidSdkLink.set(false)
+
+            // AndroidX + Compose docs
+            externalDocumentationLink {
+                url.set(new URL("https://developer.android.com/reference/"))
+                packageListUrl.set(new URL("https://developer.android.com/reference/androidx/package-list"))
+            }
+            externalDocumentationLink {
+                url.set(new URL("https://developer.android.com/reference/kotlin/"))
+                packageListUrl.set(new URL("https://developer.android.com/reference/kotlin/androidx/package-list"))
+            }
+
+            sourceLink {
+                localDirectory.set(project.file("src/main/java"))
+                // URL showing where the source code can be accessed through the web browser
+                remoteUrl.set(new URL("https://github.com/romainguy/pathway/blob/main/${project.name}/src/main/java"))
+                // Suffix which is used to append the line number to the URL. Use #L for GitHub
+                remoteLineSuffix.set("#L")
+            }
+        }
+    }
+}
+
+allprojects {
+    plugins.withId("com.vanniktech.maven.publish") {
+        mavenPublish {
+            sonatypeHost = "S01"
+        }
+    }
+}
