@@ -84,6 +84,9 @@ Conic curve. The path segment contains 3 points in the following order:
 - End point
 The curve is weighted by the `PathSegment.weight` property.
 
+Conic curves are automatically converted to quadratic curves by default, see
+[Handling conic segments](#handling-conic-segments) below for more information.
+
 #### Cubic
 
 Cubic curve. The path segment contains 4 points in the following order:
