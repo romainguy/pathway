@@ -18,12 +18,18 @@
 #define PATHWAY_PATH_ITERATOR_H
 
 #include "Path.h"
+#include "Conic.h"
 
 class PathIterator {
 public:
-    enum class VerbDirection {
-        FORWARD, // API >=30
-        BACKWARD // API < 30
+    enum class VerbDirection : uint8_t  {
+        Forward, // API >=30
+        Backward // API < 30
+    };
+
+    enum class ConicEvaluation : uint8_t {
+        AsConic,
+        AsQuadratics
     };
 
     PathIterator(
@@ -31,30 +37,38 @@ public:
             Verb* verbs,
             float* conicWeights,
             int count,
-            VerbDirection direction
+            VerbDirection direction,
+            ConicEvaluation conicEvaluation,
+            float tolerance = 0.25f
     ) noexcept
             : mPoints(points),
               mVerbs(verbs),
               mConicWeights(conicWeights),
-              mCount(count),
-              mDirection(direction) {
+              mIndex(count),
+              mDirection(direction),
+              mConicEvaluation(conicEvaluation),
+              mTolerance(tolerance) {
     }
 
-    bool hasNext() const noexcept { return mCount > 0; }
+    bool hasNext() const noexcept { return mIndex > 0; }
 
     Verb peek() const noexcept {
-        auto verbs = mDirection == VerbDirection::FORWARD ? mVerbs : mVerbs - 1;
-        return mCount > 0 ? *verbs : Verb::Done;
+        auto verbs = mDirection == VerbDirection::Forward ? mVerbs : mVerbs - 1;
+        return mIndex > 0 ? *verbs : Verb::Done;
     }
 
     Verb next(Point points[4]) noexcept;
 
 private:
-    Point* mPoints;
-    Verb* mVerbs;
-    float* mConicWeights;
-    int mCount;
-    VerbDirection mDirection;
+    const Point* mPoints;
+    const Verb* mVerbs;
+    const float* mConicWeights;
+    int mIndex;
+    const VerbDirection mDirection;
+    const ConicEvaluation mConicEvaluation;
+    const float mTolerance;
+    ConicConverter mConverter;
+    int mConicCurrentQuadratic = 0;
 };
 
 #endif //PATHWAY_PATH_ITERATOR_H

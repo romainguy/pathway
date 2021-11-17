@@ -28,7 +28,7 @@
 enum class Verb : uint8_t {
     Move,
     Line,
-    Quad,
+    Quadratic,
     Conic,
     Cubic,
     Close,

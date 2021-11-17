@@ -18,8 +18,6 @@
 
 #include <jni.h>
 
-#include <android/log.h>
-
 #include <sys/system_properties.h>
 
 #include <mutex>
@@ -27,6 +25,7 @@
 #define JNI_CLASS_NAME "dev/romainguy/graphics/path/PathIterator"
 
 #if !defined(NDEBUG)
+#include <android/log.h>
 #define ANDROID_LOG_TAG "PathIterator"
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, ANDROID_LOG_TAG, __VA_ARGS__)
 #endif
@@ -48,7 +47,9 @@ static int api_level() {
     return sApiLevel;
 }
 
-static jlong createPathIterator(JNIEnv* env, jobject, jobject path_) {
+static jlong createPathIterator(JNIEnv* env, jobject,
+        jobject path_, jint conicEvaluation_, jfloat tolerance_) {
+
     auto nativePath = static_cast<intptr_t>(env->GetLongField(path_, sPath.nativePath));
     auto* path = reinterpret_cast<Path*>(nativePath);
 
@@ -65,31 +66,34 @@ static jlong createPathIterator(JNIEnv* env, jobject, jobject path_) {
         verbs = ref->verbs;
         conicWeights = ref->conicWeights;
         count = ref->verbCount;
-        direction = PathIterator::VerbDirection::FORWARD;
+        direction = PathIterator::VerbDirection::Forward;
     } else if (apiLevel >= 26) {
         auto* ref = reinterpret_cast<PathRef26*>(path->pathRef);
         points = ref->points;
         verbs = ref->verbs;
         conicWeights = ref->conicWeights;
         count = ref->verbCount;
-        direction = PathIterator::VerbDirection::BACKWARD;
+        direction = PathIterator::VerbDirection::Backward;
     } else if (apiLevel >= 24) {
         auto* ref = reinterpret_cast<PathRef24*>(path->pathRef);
         points = ref->points;
         verbs = ref->verbs;
         conicWeights = ref->conicWeights;
         count = ref->verbCount;
-        direction = PathIterator::VerbDirection::BACKWARD;
+        direction = PathIterator::VerbDirection::Backward;
     } else {
         auto* ref = path->pathRef;
         points = ref->points;
         verbs = ref->verbs;
         conicWeights = ref->conicWeights;
         count = ref->verbCount;
-        direction = PathIterator::VerbDirection::BACKWARD;
+        direction = PathIterator::VerbDirection::Backward;
     }
 
-    return jlong(new PathIterator(points, verbs, conicWeights, count, direction));
+    return jlong(new PathIterator(
+            points, verbs, conicWeights, count, direction,
+            PathIterator::ConicEvaluation(conicEvaluation_), tolerance_
+    ));
 }
 
 static void destroyPathIterator(JNIEnv*, jobject, jlong pathIterator_) {
@@ -106,13 +110,13 @@ static jint pathIteratorNext(JNIEnv* env, jobject, jlong pathIterator_, jfloatAr
     Verb verb = pathIterator->next(pointsData);
 
     if (verb != Verb::Done && verb != Verb::Close) {
-        jfloat *points = env->GetFloatArrayElements(points_, nullptr);
+        jfloat* points = env->GetFloatArrayElements(points_, nullptr);
         switch (verb) {
             case Verb::Cubic:
             case Verb::Conic: // to copy the weight
                 points[6] = pointsData[3].x;
                 points[7] = pointsData[3].y;
-            case Verb::Quad:
+            case Verb::Quadratic:
                 points[4] = pointsData[2].x;
                 points[5] = pointsData[2].y;
             case Verb::Move:
@@ -158,7 +162,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void*) {
         static const JNINativeMethod methods[] = {
                 {
                     (char*) "createInternalPathIterator",
-                    (char*) "(Landroid/graphics/Path;)J",
+                    (char*) "(Landroid/graphics/Path;IF)J",
                     reinterpret_cast<void*>(createPathIterator)
                 },
                 {

@@ -17,13 +17,24 @@
 #include "PathIterator.h"
 
 Verb PathIterator::next(Point points[4]) noexcept {
-    if (mCount <= 0) {
+    if (mIndex <= 0) {
         return Verb::Done;
     }
 
-    mCount--;
+convertConicToQuadratic:
+    if (mConicCurrentQuadratic != mConverter.quadraticCount()) {
+        const Point* quadraticPoints = mConverter.quadratics();
+        int index = mConicCurrentQuadratic * 2;
+        points[0] = quadraticPoints[index];
+        points[1] = quadraticPoints[index + 1];
+        points[2] = quadraticPoints[index + 2];
+        mConicCurrentQuadratic++;
+        return Verb::Quadratic;
+    }
 
-    Verb verb = *(mDirection == VerbDirection::FORWARD ? mVerbs++ : --mVerbs);
+    mIndex--;
+
+    Verb verb = *(mDirection == VerbDirection::Forward ? mVerbs++ : --mVerbs);
     switch (verb) {
         case Verb::Move:
             points[0] = mPoints[0];
@@ -34,7 +45,7 @@ Verb PathIterator::next(Point points[4]) noexcept {
             points[1] = mPoints[0];
             mPoints += 1;
             break;
-        case Verb::Quad:
+        case Verb::Quadratic:
             points[0] = mPoints[-1];
             points[1] = mPoints[0];
             points[2] = mPoints[1];
@@ -48,6 +59,13 @@ Verb PathIterator::next(Point points[4]) noexcept {
             points[3].y = *mConicWeights;
             mConicWeights++;
             mPoints += 2;
+
+            if (mConicEvaluation == ConicEvaluation::AsQuadratics) {
+                mConverter.toQuadratics(points, points[3].x, mTolerance);
+                mConicCurrentQuadratic = 0;
+                goto convertConicToQuadratic;
+            }
+
             break;
         case Verb::Cubic:
             points[0] = mPoints[-1];

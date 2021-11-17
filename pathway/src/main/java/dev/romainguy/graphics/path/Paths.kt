@@ -126,15 +126,29 @@ val DoneSegment = PathSegment(PathSegment.Type.Done, emptyArray(), 0.0f)
 val CloseSegment = PathSegment(PathSegment.Type.Close, emptyArray(), 0.0f)
 
 /**
- * Cretes a new [PathIterator] for this [path][android.graphics.Path].
+ * Creates a new [PathIterator] for this [path][android.graphics.Path] that evaluates
+ * conics as quadratics. To preserve conics, use [Path.iterator].
  */
 operator fun Path.iterator() = PathIterator(this)
 
 /**
- * A path iterator can be used to iterate over all the [segments][PathSegment] that make up
- * a path. Those segments may in turn define multiple contours inside the path.
+ * Creates a new [PathIterator] for this [path][android.graphics.Path].
  */
-class PathIterator(path: Path) : Iterator<PathSegment> {
+fun Path.iterator(conicEvaluation: PathIterator.ConicEvaluation, tolerance: Float = 0.25f) =
+    PathIterator(this, conicEvaluation, tolerance)
+
+/**
+ * A path iterator can be used to iterate over all the [segments][PathSegment] that make up
+ * a path. Those segments may in turn define multiple contours inside the path. Conic segments
+ * are by default evaluated as approximated quadratic segments, to preserve conic segments set
+ * [conicEvaluation] to [AsConic][ConicEvaluation.AsConic]. The error of the approximation
+ * is controlled by [tolerance].
+ */
+class PathIterator(
+    val path: Path,
+    val conicEvaluation: ConicEvaluation = ConicEvaluation.AsQuadratics,
+    val tolerance: Float = 0.25f
+) : Iterator<PathSegment> {
     private companion object {
         init {
             System.loadLibrary("pathway")
@@ -142,7 +156,9 @@ class PathIterator(path: Path) : Iterator<PathSegment> {
 
         @JvmStatic
         @Suppress("KotlinJniMissingFunction")
-        external fun createInternalPathIterator(path: Path): Long
+        external fun createInternalPathIterator(
+            path: Path, conicEvaluation: Int, tolerance: Float
+        ): Long
 
         @JvmStatic
         @Suppress("KotlinJniMissingFunction")
@@ -161,8 +177,25 @@ class PathIterator(path: Path) : Iterator<PathSegment> {
         external fun internalPathIteratorPeek(internalPathIterator: Long): Int
     }
 
+    /**
+     * Defines the type of evaluation to apply to conic segments during iteration.
+     */
+    enum class ConicEvaluation {
+        /**
+         * Conic segments are returned as conic segments.
+         */
+        AsConic,
+
+        /**
+         * Conic segments are returned as quadratic approximations. The quality of the
+         * approximation is defined by a tolerance value.
+         */
+        AsQuadratics
+    }
+
     private val pointsData = FloatArray(8) // 4 points max -> 8 floats
-    private val internalPathIterator: Long = createInternalPathIterator(path)
+    private val internalPathIterator: Long =
+        createInternalPathIterator(path, conicEvaluation.ordinal, tolerance)
 
     /**
      * Returns `true` if the iteration has more elements.

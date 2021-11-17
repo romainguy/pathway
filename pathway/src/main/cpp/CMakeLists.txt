@@ -4,6 +4,17 @@ project("pathway")
 add_library(
     pathway
     SHARED
+    Conic.cpp
     PathIterator.cpp
     pathway.cpp
+)
+
+find_library(
+    log-lib
+    log
+)
+
+target_link_libraries(
+    pathway
+    ${log-lib}
 )

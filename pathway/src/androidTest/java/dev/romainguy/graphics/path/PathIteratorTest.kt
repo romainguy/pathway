@@ -16,13 +16,15 @@
 
 package dev.romainguy.graphics.path
 
-import android.graphics.Path
-import android.graphics.PointF
+import android.graphics.*
 import android.os.Build
+import androidx.core.graphics.applyCanvas
+import androidx.core.graphics.createBitmap
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.math.abs
 
 private fun assertPointsEquals(p1: PointF, p2: PointF) {
     assertEquals(p1.x, p2.x, 1e-6f)
@@ -32,6 +34,30 @@ private fun assertPointsEquals(p1: PointF, p2: PointF) {
 private fun assertPointsEquals(p1: FloatArray, offset: Int, p2: PointF) {
     assertEquals(p1[0 + offset * 2], p2.x, 1e-6f)
     assertEquals(p1[1 + offset * 2], p2.y, 1e-6f)
+}
+
+private fun compareBitmaps(b1: Bitmap, b2: Bitmap, error: Int = 1) {
+    assertEquals(b1.width, b2.width)
+    assertEquals(b1.height, b2.height)
+
+    val p1 = IntArray(b1.width * b1.height)
+    b1.getPixels(p1, 0, b1.width, 0, 0, b1.width, b1.height)
+
+    val p2 = IntArray(b2.width * b2.height)
+    b2.getPixels(p2, 0, b2.width, 0, 0, b2.width, b2.height)
+
+    for (x in 0 until b1.width) {
+        for (y in 0 until b2.width) {
+            val index = y * b1.width + x
+
+            val c1 = p1[index]
+            val c2 = p2[index]
+
+            assertTrue(abs(Color.red(c1) - Color.red(c2)) <= error)
+            assertTrue(abs(Color.green(c1) - Color.green(c2)) <= error)
+            assertTrue(abs(Color.blue(c1) - Color.blue(c2)) <= error)
+        }
+    }
 }
 
 @RunWith(AndroidJUnit4::class)
@@ -129,7 +155,7 @@ class PathIteratorTest {
     }
 
     @Test
-    fun iteratorLevels() {
+    fun iteratorStyles() {
         val path = Path().apply {
             moveTo(1.0f, 1.0f)
             lineTo(2.0f, 2.0f)
@@ -141,8 +167,8 @@ class PathIteratorTest {
             close()
         }
 
-        val iterator1 = path.iterator()
-        val iterator2 = path.iterator()
+        val iterator1 = path.iterator(PathIterator.ConicEvaluation.AsConic)
+        val iterator2 = path.iterator(PathIterator.ConicEvaluation.AsConic)
 
         val points = FloatArray(8)
 
@@ -302,7 +328,7 @@ class PathIteratorTest {
                 addRoundRect(12.0f, 12.0f, 24.0f, 24.0f, 8.0f, 8.0f, Path.Direction.CW)
             }
 
-            val iterator = path.iterator()
+            val iterator = path.iterator(PathIterator.ConicEvaluation.AsConic)
             // Swallow the move
             iterator.next()
 
@@ -316,5 +342,66 @@ class PathIteratorTest {
             assertPointsEquals(PointF(18.0f, 12.0f), segment.points[2])
             assertEquals(0.70710677f, segment.weight)
         }
+    }
+
+    @Test
+    fun conicAsQuadratics() {
+        val path = Path().apply {
+            addRoundRect(12.0f, 12.0f, 24.0f, 24.0f, 8.0f, 8.0f, Path.Direction.CW)
+        }
+
+        for (segment in path) {
+            if (segment.type == PathSegment.Type.Conic) fail("Found conic, none expected: $segment")
+        }
+    }
+
+    @Test
+    fun convertedConics() {
+        val path1 = Path().apply {
+            addRoundRect(12.0f, 12.0f, 64.0f, 64.0f, 12.0f, 12.0f, Path.Direction.CW)
+        }
+
+        val path2 = Path()
+        for (segment in path1) {
+            android.util.Log.d("Test", "$segment")
+            when (segment.type) {
+                PathSegment.Type.Move -> path2.moveTo(segment.points[0].x, segment.points[0].y)
+                PathSegment.Type.Line -> path2.lineTo(segment.points[1].x, segment.points[1].y)
+                PathSegment.Type.Quadratic -> path2.quadTo(
+                    segment.points[1].x, segment.points[1].y,
+                    segment.points[2].x, segment.points[2].y
+                )
+                PathSegment.Type.Conic -> fail("Unexpected conic! $segment")
+                PathSegment.Type.Cubic -> path2.cubicTo(
+                    segment.points[1].x, segment.points[1].y,
+                    segment.points[2].x, segment.points[2].y,
+                    segment.points[3].x, segment.points[3].y
+                )
+                PathSegment.Type.Close -> path2.close()
+                PathSegment.Type.Done ->  { }
+            }
+        }
+
+        val b1 = createBitmap(76, 76).applyCanvas {
+            drawARGB(255, 255, 255, 255)
+            drawPath(path1, Paint().apply {
+                color = Color.argb(1.0f, 0.0f, 0.0f, 1.0f)
+                strokeWidth = 2.0f
+                isAntiAlias = true
+                style = Paint.Style.STROKE
+            })
+        }
+
+        val b2 = createBitmap(76, 76).applyCanvas {
+            drawARGB(255, 255, 255, 255)
+            drawPath(path2, Paint().apply {
+                color = Color.argb(1.0f, 0.0f, 0.0f, 1.0f)
+                strokeWidth = 2.0f
+                isAntiAlias = true
+                style = Paint.Style.STROKE
+            })
+        }
+
+        compareBitmaps(b1, b2)
     }
 }

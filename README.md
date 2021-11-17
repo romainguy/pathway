@@ -16,13 +16,9 @@ repositories {
 }
 
 dependencies {
-    implementation 'dev.romainguy:pathway:0.1.0'
+    implementation 'dev.romainguy:pathway:0.2.0'
 }
 ```
-
-## Roadmap
-
-- Automatically convert conic segments to quadratics
 
 ## Iterating over a Path
 
@@ -108,3 +104,26 @@ any point. The weight is set 0.0f and not meaningful.
 Done command. This optional command indicates that no further segment will be
 found in the path. It typically indicates the end of an iteration over a path
 and can be ignored.
+
+### Handling conic segments
+
+In some API levels, paths may contain conic curves (weighted quadratics) but the
+`Path` API does not offer a way to add conics to a `Path` object. To work around
+this, Pathway automatically converts conics into several quadratics by default.
+
+The conic to quadratic conversion is an approximation controlled by a tolerance
+threshold, set by default to 0.25f (sub-pixel). If you want to preserve conics
+or control the tolerance, you can use the following APIs:
+
+```kotlin
+// Preserve conics
+val iterator = path.iterator(PathIterator.ConicEvaluation.AsConic)
+
+// Control the tolerance of the conic to quadratic conversion
+val iterator = path.iterator(PathIterator.ConicEvaluation.AsQuadratics, 2.0f)
+
+```
+
+## License
+
+Please see LICENSE.
