@@ -1,6 +1,7 @@
 # Pathway
 
 [![pathway](https://maven-badges.herokuapp.com/maven-central/dev.romainguy/pathway/badge.svg?subject=pathway)](https://maven-badges.herokuapp.com/maven-central/dev.romainguy/pathway)
+[![Android build status](https://github.com/romainguy/pathway/workflows/Android/badge.svg)](https://github.com/romainguy/pathway/actions?query=workflow%3AAndroid)
 
 Pathway is an Android library that provides new functionalities around the graphics
 [Path](https://developer.android.com/reference/android/graphics/Path) API.
