@@ -138,6 +138,11 @@ fun Path.iterator(conicEvaluation: PathIterator.ConicEvaluation, tolerance: Floa
     PathIterator(this, conicEvaluation, tolerance)
 
 /**
+ * Cache of [PathSegment.Type] values to avoid internal allocation on each use.
+ */
+internal val pathSegmentTypes = PathSegment.Type.values()
+
+/**
  * A path iterator can be used to iterate over all the [segments][PathSegment] that make up
  * a path. Those segments may in turn define multiple contours inside the path. Conic segments
  * are by default evaluated as approximated quadratic segments, to preserve conic segments set
@@ -206,7 +211,7 @@ class PathIterator(
      * Returns the type of the current segment in the iteration, or [Done][PathSegment.Type.Done]
      * if the iteration is finished.
      */
-    fun peek() = PathSegment.Type.values()[internalPathIteratorPeek(internalPathIterator)]
+    fun peek() = pathSegmentTypes[internalPathIteratorPeek(internalPathIterator)]
 
     /**
      * Returns the [type][PathSegment.Type] of the next [path segment][PathSegment] in the iteration
@@ -228,7 +233,7 @@ class PathIterator(
     fun next(points: FloatArray): PathSegment.Type {
         check(points.size >= 8) { "The points array must contain at least 8 floats" }
         val typeValue = internalPathIteratorNext(internalPathIterator, points)
-        return PathSegment.Type.values()[typeValue]
+        return pathSegmentTypes[typeValue]
     }
 
     /**
@@ -238,7 +243,7 @@ class PathIterator(
      */
     override fun next(): PathSegment {
         val typeValue = internalPathIteratorNext(internalPathIterator, pointsData)
-        val type = PathSegment.Type.values()[typeValue]
+        val type = pathSegmentTypes[typeValue]
 
         if (type == PathSegment.Type.Done) return DoneSegment
         if (type == PathSegment.Type.Close) return CloseSegment
