@@ -75,6 +75,7 @@ Quadratic curve. The path segment contains 3 points in the following order:
 - Start point
 - Control point
 - End point
+
 The weight is set 0.0f and not meaningful.
 
 #### Conic
@@ -83,6 +84,7 @@ Conic curve. The path segment contains 3 points in the following order:
 - Start point
 - Control point
 - End point
+
 The curve is weighted by the `PathSegment.weight` property.
 
 Conic curves are automatically converted to quadratic curves by default, see
@@ -95,6 +97,7 @@ Cubic curve. The path segment contains 4 points in the following order:
 - First control point
 - Second control point
 - End point
+
 The weight is set 0.0f and not meaningful.
 
 #### Close
