@@ -32,8 +32,8 @@ val path = Path().apply {
 }
 
 for (segment in path) {
-    val type = path.type // The type of segment (move, cubic, quadratic, line, close, etc.)
-    val points = path.points // The points describing the segment geometry
+    val type = segment.type // The type of segment (move, cubic, quadratic, line, close, etc.)
+    val points = segment.points // The points describing the segment geometry
 }
 ```
 
