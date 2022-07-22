@@ -385,7 +385,7 @@ class PathIteratorTest {
         val b1 = createBitmap(76, 76).applyCanvas {
             drawARGB(255, 255, 255, 255)
             drawPath(path1, Paint().apply {
-                color = Color.argb(1.0f, 0.0f, 0.0f, 1.0f)
+                color = argb(1.0f, 0.0f, 0.0f, 1.0f)
                 strokeWidth = 2.0f
                 isAntiAlias = true
                 style = Paint.Style.STROKE
@@ -395,7 +395,7 @@ class PathIteratorTest {
         val b2 = createBitmap(76, 76).applyCanvas {
             drawARGB(255, 255, 255, 255)
             drawPath(path2, Paint().apply {
-                color = Color.argb(1.0f, 0.0f, 0.0f, 1.0f)
+                color = argb(1.0f, 0.0f, 0.0f, 1.0f)
                 strokeWidth = 2.0f
                 isAntiAlias = true
                 style = Paint.Style.STROKE
@@ -405,3 +405,9 @@ class PathIteratorTest {
         compareBitmaps(b1, b2)
     }
 }
+
+fun argb(alpha: Float, red: Float, green: Float, blue: Float) =
+    ((alpha * 255.0f + 0.5f).toInt() shl 24) or
+    ((red   * 255.0f + 0.5f).toInt() shl 16) or
+    ((green * 255.0f + 0.5f).toInt() shl 8) or
+     (blue  * 255.0f + 0.5f).toInt()

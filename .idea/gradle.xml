@@ -14,7 +14,6 @@
             <option value="$PROJECT_DIR$/pathway" />
           </set>
         </option>
-        <option name="resolveModulePerSourceSet" value="false" />
       </GradleProjectSettings>
     </option>
   </component>
