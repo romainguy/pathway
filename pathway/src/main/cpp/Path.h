@@ -41,8 +41,7 @@ struct Point {
 };
 
 struct PathRef21 {
-    __unused uint32_t padding0;      // Virtual tables
-    __unused uint32_t padding1;
+    __unused intptr_t pointer;
     __unused int32_t refCount;
     __unused float left;
     __unused float top;
@@ -64,8 +63,7 @@ struct PathRef21 {
 };
 
 struct PathRef24 {
-    __unused uint32_t padding0;
-    __unused uint32_t padding1;
+    __unused intptr_t pointer;
     __unused int32_t refCount;
     __unused float left;
     __unused float top;
