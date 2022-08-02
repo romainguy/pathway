@@ -145,6 +145,14 @@ static jint pathIteratorPeek(JNIEnv*, jobject, jlong pathIterator_) {
     return static_cast<jint>(reinterpret_cast<PathIterator *>(pathIterator_)->peek());
 }
 
+static jint pathIteratorRawSize(JNIEnv*, jobject, jlong pathIterator_) {
+    return static_cast<jint>(reinterpret_cast<PathIterator *>(pathIterator_)->rawCount());
+}
+
+static jint pathIteratorSize(JNIEnv*, jobject, jlong pathIterator_) {
+    return static_cast<jint>(reinterpret_cast<PathIterator *>(pathIterator_)->count());
+}
+
 JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void*) {
     JNIEnv* env;
     if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
@@ -186,6 +194,16 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void*) {
                     (char*) "internalPathIteratorPeek",
                     (char*) "(J)I",
                     reinterpret_cast<void*>(pathIteratorPeek)
+                },
+                {
+                    (char*) "internalPathIteratorRawSize",
+                    (char*) "(J)I",
+                    reinterpret_cast<void*>(pathIteratorRawSize)
+                },
+                {
+                    (char*) "internalPathIteratorSize",
+                    (char*) "(J)I",
+                    reinterpret_cast<void*>(pathIteratorSize)
                 },
         };
 

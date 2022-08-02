@@ -426,6 +426,23 @@ class PathIteratorTest {
 
         compareBitmaps(b1, b2)
     }
+
+    @Test
+    fun sizes() {
+        val path = Path().apply {
+            addRoundRect(12.0f, 12.0f, 24.0f, 24.0f, 8.0f, 8.0f, Path.Direction.CW)
+        }
+
+        // Preserve conics and count
+        var iterator = path.iterator(PathIterator.ConicEvaluation.AsConic)
+        assertEquals(6, iterator.rawSize())
+        assertEquals(iterator.rawSize(), iterator.size())
+
+        // Convert conics and count
+        iterator = path.iterator(PathIterator.ConicEvaluation.AsQuadratics)
+        assertEquals(6, iterator.rawSize())
+        assertEquals(10, iterator.size())
+    }
 }
 
 fun argb(alpha: Float, red: Float, green: Float, blue: Float) =

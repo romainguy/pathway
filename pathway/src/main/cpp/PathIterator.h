@@ -45,10 +45,15 @@ public:
               mVerbs(verbs),
               mConicWeights(conicWeights),
               mIndex(count),
+              mCount(count),
               mDirection(direction),
               mConicEvaluation(conicEvaluation),
               mTolerance(tolerance) {
     }
+
+    int rawCount() const noexcept { return mCount; }
+
+    int count() noexcept;
 
     bool hasNext() const noexcept { return mIndex > 0; }
 
@@ -64,6 +69,7 @@ private:
     const Verb* mVerbs;
     const float* mConicWeights;
     int mIndex;
+    const int mCount;
     const VerbDirection mDirection;
     const ConicEvaluation mConicEvaluation;
     const float mTolerance;

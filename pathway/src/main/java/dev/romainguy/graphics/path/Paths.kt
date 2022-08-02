@@ -184,6 +184,14 @@ class PathIterator(
         @JvmStatic
         @Suppress("KotlinJniMissingFunction")
         external fun internalPathIteratorPeek(internalPathIterator: Long): Int
+
+        @JvmStatic
+        @Suppress("KotlinJniMissingFunction")
+        external fun internalPathIteratorRawSize(internalPathIterator: Long): Int
+
+        @JvmStatic
+        @Suppress("KotlinJniMissingFunction")
+        external fun internalPathIteratorSize(internalPathIterator: Long): Int
     }
 
     /**
@@ -205,6 +213,23 @@ class PathIterator(
     private val pointsData = FloatArray(8) // 4 points max -> 8 floats
     private val internalPathIterator: Long =
         createInternalPathIterator(path, conicEvaluation.ordinal, tolerance)
+
+    /**
+     * Returns the number of verbs present in this iterator, i.e. the number of calls to
+     * [next] required to complete the iteration. If the [conicEvaluation] property is set
+     * to [ConicEvaluation.AsQuadratics], computing the number of verbs requires a full
+     * iteration and conversion of any existing conics in the path. For a faster approximate
+     * size, use [rawSize] instead.
+     */
+    fun size() = internalPathIteratorSize(internalPathIterator)
+
+    /**
+     * Returns the raw number of verbs present in this iterator's path. If the [conicEvaluation]
+     * property is set to [ConicEvaluation.AsQuadratics], the returned size might be smaller
+     * than the number of calls to [next] required to fully iterate over the path. An accurate
+     * size can be computed by calling [size] instead, at a performance cost.
+     */
+    fun rawSize() = internalPathIteratorRawSize(internalPathIterator)
 
     /**
      * Returns `true` if the iteration has more elements.

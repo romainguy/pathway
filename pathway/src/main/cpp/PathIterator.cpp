@@ -16,6 +16,48 @@
 
 #include "PathIterator.h"
 
+int PathIterator::count() noexcept {
+    if (mConicEvaluation == ConicEvaluation::AsConic) {
+        return mCount;
+    }
+
+    int count = 0;
+    const Verb* verbs = mVerbs;
+    const Point* points = mPoints;
+    const float* conicWeights = mConicWeights;
+
+    for (int i = 0; i < mCount; i++) {
+        Verb verb = *(mDirection == VerbDirection::Forward ? verbs++ : --verbs);
+        switch (verb) {
+            case Verb::Move:
+            case Verb::Line:
+                points += 1;
+                count++;
+                break;
+            case Verb::Quadratic:
+                points += 2;
+                count++;
+                break;
+            case Verb::Conic:
+                mConverter.toQuadratics(points - 1, *conicWeights, mTolerance);
+                conicWeights++;
+                points += 2;
+                count += mConverter.quadraticCount();
+                break;
+            case Verb::Cubic:
+                points += 3;
+                count++;
+                break;
+            case Verb::Close:
+            case Verb::Done:
+                count++;
+                break;
+        }
+    }
+
+    return count;
+}
+
 Verb PathIterator::next(Point points[4]) noexcept {
     if (mIndex <= 0) {
         return Verb::Done;
