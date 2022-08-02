@@ -38,7 +38,7 @@ struct {
 uint32_t sApiLevel = 0;
 std::once_flag sApiLevelOnceFlag;
 
-static int api_level() {
+static uint32_t api_level() {
     std::call_once(sApiLevelOnceFlag, []() {
         char sdkVersion[PROP_VALUE_MAX];
         __system_property_get("ro.build.version.sdk", sdkVersion);
@@ -59,7 +59,7 @@ static jlong createPathIterator(JNIEnv* env, jobject,
     int count;
     PathIterator::VerbDirection direction;
 
-    const int apiLevel = api_level();
+    const uint32_t apiLevel = api_level();
     if (apiLevel >= 30) {
         auto* ref = reinterpret_cast<PathRef30*>(path->pathRef);
         points = ref->points;
@@ -104,13 +104,15 @@ static jboolean pathIteratorHasNext(JNIEnv*, jobject, jlong pathIterator_) {
     return reinterpret_cast<PathIterator*>(pathIterator_)->hasNext();
 }
 
-static jint pathIteratorNext(JNIEnv* env, jobject, jlong pathIterator_, jfloatArray points_) {
+static jint pathIteratorNext(
+        JNIEnv* env, jobject, jlong pathIterator_, jfloatArray points_, jint offset_) {
     auto pathIterator = reinterpret_cast<PathIterator*>(pathIterator_);
     Point pointsData[4];
     Verb verb = pathIterator->next(pointsData);
 
     if (verb != Verb::Done && verb != Verb::Close) {
-        jfloat* points = env->GetFloatArrayElements(points_, nullptr);
+        auto* pointsArray = static_cast<jfloat*>(env->GetPrimitiveArrayCritical(points_, nullptr));
+        jfloat* points = pointsArray + offset_;
         switch (verb) {
             case Verb::Cubic:
             case Verb::Conic: // to copy the weight
@@ -133,7 +135,7 @@ static jint pathIteratorNext(JNIEnv* env, jobject, jlong pathIterator_, jfloatAr
                 break;
 #pragma clang diagnostic pop
         }
-        env->ReleaseFloatArrayElements(points_, points, 0);
+        env->ReleasePrimitiveArrayCritical(points_, pointsArray, 0);
     }
 
     return static_cast<jint>(verb);
@@ -177,7 +179,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void*) {
                 },
                 {
                     (char*) "internalPathIteratorNext",
-                    (char*) "(J[F)I",
+                    (char*) "(J[FI)I",
                     reinterpret_cast<void*>(pathIteratorNext)
                 },
                 {

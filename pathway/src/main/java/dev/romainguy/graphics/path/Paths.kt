@@ -175,7 +175,11 @@ class PathIterator(
 
         @JvmStatic
         @Suppress("KotlinJniMissingFunction")
-        external fun internalPathIteratorNext(internalPathIterator: Long, points: FloatArray): Int
+        external fun internalPathIteratorNext(
+            internalPathIterator: Long,
+            points: FloatArray,
+            offset: Int
+        ): Int
 
         @JvmStatic
         @Suppress("KotlinJniMissingFunction")
@@ -228,11 +232,13 @@ class PathIterator(
      * - [Done][PathSegment.Type.Done]: 0 pair
      * This method does not allocate any memory.
      *
-     * @param points *Must* be a [FloatArray] of size 8, throws an [IllegalStateException] otherwise.
+     * @param points A [FloatArray] large enough to hold 8 floats starting at [offset],
+     *               throws an [IllegalStateException] otherwise.
+     * @param offset Offset in [points] where to store the result
      */
-    fun next(points: FloatArray): PathSegment.Type {
-        check(points.size >= 8) { "The points array must contain at least 8 floats" }
-        val typeValue = internalPathIteratorNext(internalPathIterator, points)
+    fun next(points: FloatArray, offset: Int = 0): PathSegment.Type {
+        check(points.size - offset >= 8) { "The points array must contain at least 8 floats" }
+        val typeValue = internalPathIteratorNext(internalPathIterator, points, offset)
         return pathSegmentTypes[typeValue]
     }
 
@@ -242,7 +248,7 @@ class PathIterator(
      * [next] method.
      */
     override fun next(): PathSegment {
-        val typeValue = internalPathIteratorNext(internalPathIterator, pointsData)
+        val typeValue = internalPathIteratorNext(internalPathIterator, pointsData, 0)
         val type = pathSegmentTypes[typeValue]
 
         if (type == PathSegment.Type.Done) return DoneSegment

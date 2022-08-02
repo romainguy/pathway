@@ -169,27 +169,37 @@ class PathIteratorTest {
 
         val iterator1 = path.iterator(PathIterator.ConicEvaluation.AsConic)
         val iterator2 = path.iterator(PathIterator.ConicEvaluation.AsConic)
+        val iterator3 = path.iterator(PathIterator.ConicEvaluation.AsConic)
 
         val points = FloatArray(8)
+        val points2 = FloatArray(16)
 
-        while (iterator1.hasNext() || iterator2.hasNext()) {
+        while (iterator1.hasNext() || iterator2.hasNext() || iterator3.hasNext()) {
             val segment = iterator1.next()
             val type = iterator2.next(points)
+            val type2 = iterator3.next(points2, 8)
 
             assertEquals(type, segment.type)
+            assertEquals(type2, segment.type)
 
             when (type) {
                 PathSegment.Type.Move -> {
                     assertPointsEquals(points, 0, segment.points[0])
+                    assertPointsEquals(points2, 4, segment.points[0])
                 }
                 PathSegment.Type.Line -> {
                     assertPointsEquals(points, 0, segment.points[0])
                     assertPointsEquals(points, 1, segment.points[1])
+                    assertPointsEquals(points2, 4, segment.points[0])
+                    assertPointsEquals(points2, 5, segment.points[1])
                 }
                 PathSegment.Type.Quadratic -> {
                     assertPointsEquals(points, 0, segment.points[0])
                     assertPointsEquals(points, 1, segment.points[1])
                     assertPointsEquals(points, 2, segment.points[2])
+                    assertPointsEquals(points2, 4, segment.points[0])
+                    assertPointsEquals(points2, 5, segment.points[1])
+                    assertPointsEquals(points2, 6, segment.points[2])
                 }
                 PathSegment.Type.Conic -> {
                     assertPointsEquals(points, 0, segment.points[0])
@@ -198,12 +208,24 @@ class PathIteratorTest {
                     // We store the weight twice
                     assertEquals(points[6], segment.weight)
                     assertEquals(points[7], segment.weight)
+
+                    assertPointsEquals(points2, 4, segment.points[0])
+                    assertPointsEquals(points2, 5, segment.points[1])
+                    assertPointsEquals(points2, 6, segment.points[2])
+                    // We store the weight twice
+                    assertEquals(points2[14], segment.weight)
+                    assertEquals(points2[15], segment.weight)
                 }
                 PathSegment.Type.Cubic -> {
                     assertPointsEquals(points, 0, segment.points[0])
                     assertPointsEquals(points, 1, segment.points[1])
                     assertPointsEquals(points, 2, segment.points[2])
                     assertPointsEquals(points, 3, segment.points[3])
+
+                    assertPointsEquals(points2, 4, segment.points[0])
+                    assertPointsEquals(points2, 5, segment.points[1])
+                    assertPointsEquals(points2, 6, segment.points[2])
+                    assertPointsEquals(points2, 7, segment.points[3])
                 }
                 PathSegment.Type.Close -> { }
                 PathSegment.Type.Done -> { }
