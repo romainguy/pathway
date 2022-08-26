@@ -56,6 +56,7 @@ class PathSegment internal constructor(val type: Type, val points: Array<PointF>
          * - Start point
          * - Control point
          * - End point
+         *
          * The weight is set 0.0f and not meaningful.
          */
         Quadratic,
@@ -64,6 +65,7 @@ class PathSegment internal constructor(val type: Type, val points: Array<PointF>
          * - Start point
          * - Control point
          * - End point
+         *
          * The curve is weighted by the [weight][PathSegment.weight] property.
          */
         Conic,
@@ -73,6 +75,7 @@ class PathSegment internal constructor(val type: Type, val points: Array<PointF>
          * - First control point
          * - Second control point
          * - End point
+         *
          * The weight is set 0.0f and not meaningful.
          */
         Cubic,
@@ -244,7 +247,7 @@ class PathIterator(
 
     /**
      * Returns the [type][PathSegment.Type] of the next [path segment][PathSegment] in the iteration
-     * and fills [points] with the points specific to the segment type. Each pair of of floats in
+     * and fills [points] with the points specific to the segment type. Each pair of floats in
      * the [points] array represents a point for the given segment. The number of pairs of floats
      * depends on the [PathSegment.Type]:
      * - [Move][PathSegment.Type.Move]: 1 pair (indices 0 to 1)
@@ -255,6 +258,7 @@ class PathIterator(
      * - [Move][PathSegment.Type.Cubic]: 4 pairs (indices 0 to 7)
      * - [Close][PathSegment.Type.Close]: 0 pair
      * - [Done][PathSegment.Type.Done]: 0 pair
+     *
      * This method does not allocate any memory.
      *
      * @param points A [FloatArray] large enough to hold 8 floats starting at [offset],
