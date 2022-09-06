@@ -380,12 +380,11 @@ class PathIteratorTest {
     @Test
     fun convertedConics() {
         val path1 = Path().apply {
-            addRoundRect(12.0f, 12.0f, 64.0f, 64.0f, 12.0f, 12.0f, Path.Direction.CW)
+            addRoundRect(RectF(12.0f, 12.0f, 64.0f, 64.0f), 12.0f, 12.0f, Path.Direction.CW)
         }
 
         val path2 = Path()
         for (segment in path1) {
-            android.util.Log.d("Test", "$segment")
             when (segment.type) {
                 PathSegment.Type.Move -> path2.moveTo(segment.points[0].x, segment.points[0].y)
                 PathSegment.Type.Line -> path2.lineTo(segment.points[1].x, segment.points[1].y)
@@ -430,18 +429,18 @@ class PathIteratorTest {
     @Test
     fun sizes() {
         val path = Path().apply {
-            addRoundRect(12.0f, 12.0f, 24.0f, 24.0f, 8.0f, 8.0f, Path.Direction.CW)
+            addRoundRect(RectF(12.0f, 12.0f, 64.0f, 64.0f), 8.0f, 8.0f, Path.Direction.CW)
         }
 
         // Preserve conics and count
         var iterator = path.iterator(PathIterator.ConicEvaluation.AsConic)
-        assertEquals(6, iterator.rawSize())
+        assertEquals(10, iterator.rawSize())
         assertEquals(iterator.rawSize(), iterator.size())
 
         // Convert conics and count
         iterator = path.iterator(PathIterator.ConicEvaluation.AsQuadratics)
-        assertEquals(6, iterator.rawSize())
-        assertEquals(10, iterator.size())
+        assertEquals(10, iterator.rawSize())
+        assertEquals(14, iterator.size())
     }
 }
 
