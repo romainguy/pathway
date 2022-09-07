@@ -111,31 +111,8 @@ static jint pathIteratorNext(
     Verb verb = pathIterator->next(pointsData);
 
     if (verb != Verb::Done && verb != Verb::Close) {
-        auto* pointsArray = static_cast<jfloat*>(env->GetPrimitiveArrayCritical(points_, nullptr));
-        jfloat* points = pointsArray + offset_;
-        switch (verb) {
-            case Verb::Cubic:
-            case Verb::Conic: // to copy the weight
-                points[6] = pointsData[3].x;
-                points[7] = pointsData[3].y;
-            case Verb::Quadratic:
-                points[4] = pointsData[2].x;
-                points[5] = pointsData[2].y;
-            case Verb::Move:
-            case Verb::Line:
-                points[2] = pointsData[1].x;
-                points[3] = pointsData[1].y;
-                points[0] = pointsData[0].x;
-                points[1] = pointsData[0].y;
-                break;
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "UnreachableCode"
-            case Verb::Close:
-            case Verb::Done:
-                break;
-#pragma clang diagnostic pop
-        }
-        env->ReleasePrimitiveArrayCritical(points_, pointsArray, 0);
+        auto* floatsData = reinterpret_cast<jfloat*>(pointsData);
+        env->SetFloatArrayRegion(points_, offset_, 8, floatsData);
     }
 
     return static_cast<jint>(verb);

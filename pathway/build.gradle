@@ -8,12 +8,12 @@ group = GROUP
 version = VERSION_NAME
 
 android {
-    compileSdk 31
-    ndkVersion '23.1.7779620'
+    compileSdk 33
+    ndkVersion '25.0.8775105'
 
     defaultConfig {
         minSdk 21
-        targetSdk 31
+        targetSdk 33
 
         externalNativeBuild {
             cmake {
@@ -36,7 +36,7 @@ android {
     externalNativeBuild {
         cmake {
             path file('src/main/cpp/CMakeLists.txt')
-            version '3.18.1'
+            version '3.22.1'
         }
     }
 }
