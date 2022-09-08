@@ -22,7 +22,7 @@
 
 #include <mutex>
 
-#define JNI_CLASS_NAME "dev/romainguy/graphics/path/PathIterator"
+#define JNI_CLASS_NAME "dev/romainguy/graphics/path/Paths"
 
 #if !defined(NDEBUG)
 #include <android/log.h>
@@ -96,16 +96,16 @@ static jlong createPathIterator(JNIEnv* env, jobject,
     ));
 }
 
-static void destroyPathIterator(JNIEnv*, jobject, jlong pathIterator_) {
+static void destroyPathIterator(JNIEnv*, jclass, jlong pathIterator_) {
     delete reinterpret_cast<PathIterator*>(pathIterator_);
 }
 
-static jboolean pathIteratorHasNext(JNIEnv*, jobject, jlong pathIterator_) {
+static jboolean pathIteratorHasNext(JNIEnv*, jclass, jlong pathIterator_) {
     return reinterpret_cast<PathIterator*>(pathIterator_)->hasNext();
 }
 
 static jint pathIteratorNext(
-        JNIEnv* env, jobject, jlong pathIterator_, jfloatArray points_, jint offset_) {
+        JNIEnv* env, jclass, jlong pathIterator_, jfloatArray points_, jint offset_) {
     auto pathIterator = reinterpret_cast<PathIterator*>(pathIterator_);
     Point pointsData[4];
     Verb verb = pathIterator->next(pointsData);
@@ -118,15 +118,15 @@ static jint pathIteratorNext(
     return static_cast<jint>(verb);
 }
 
-static jint pathIteratorPeek(JNIEnv*, jobject, jlong pathIterator_) {
+static jint pathIteratorPeek(JNIEnv*, jclass, jlong pathIterator_) {
     return static_cast<jint>(reinterpret_cast<PathIterator *>(pathIterator_)->peek());
 }
 
-static jint pathIteratorRawSize(JNIEnv*, jobject, jlong pathIterator_) {
+static jint pathIteratorRawSize(JNIEnv*, jclass, jlong pathIterator_) {
     return static_cast<jint>(reinterpret_cast<PathIterator *>(pathIterator_)->rawCount());
 }
 
-static jint pathIteratorSize(JNIEnv*, jobject, jlong pathIterator_) {
+static jint pathIteratorSize(JNIEnv*, jclass, jlong pathIterator_) {
     return static_cast<jint>(reinterpret_cast<PathIterator *>(pathIterator_)->count());
 }
 

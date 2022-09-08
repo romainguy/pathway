@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:JvmName("Paths")
+
 package dev.romainguy.graphics.path
 
 import android.graphics.Path
@@ -129,6 +131,11 @@ val DoneSegment = PathSegment(PathSegment.Type.Done, emptyArray(), 0.0f)
 val CloseSegment = PathSegment(PathSegment.Type.Close, emptyArray(), 0.0f)
 
 /**
+ * Cache of [PathSegment.Type] values to avoid internal allocation on each use.
+ */
+private val pathSegmentTypes = PathSegment.Type.values()
+
+/**
  * Creates a new [PathIterator] for this [path][android.graphics.Path] that evaluates
  * conics as quadratics. To preserve conics, use [Path.iterator].
  */
@@ -139,11 +146,6 @@ operator fun Path.iterator() = PathIterator(this)
  */
 fun Path.iterator(conicEvaluation: PathIterator.ConicEvaluation, tolerance: Float = 0.25f) =
     PathIterator(this, conicEvaluation, tolerance)
-
-/**
- * Cache of [PathSegment.Type] values to avoid internal allocation on each use.
- */
-internal val pathSegmentTypes = PathSegment.Type.values()
 
 /**
  * A path iterator can be used to iterate over all the [segments][PathSegment] that make up
@@ -161,40 +163,6 @@ class PathIterator(
         init {
             System.loadLibrary("pathway")
         }
-
-        @JvmStatic
-        @Suppress("KotlinJniMissingFunction")
-        external fun createInternalPathIterator(
-            path: Path, conicEvaluation: Int, tolerance: Float
-        ): Long
-
-        @JvmStatic
-        @Suppress("KotlinJniMissingFunction")
-        external fun destroyInternalPathIterator(internalPathIterator: Long)
-
-        @JvmStatic
-        @Suppress("KotlinJniMissingFunction")
-        external fun internalPathIteratorHasNext(internalPathIterator: Long): Boolean
-
-        @JvmStatic
-        @Suppress("KotlinJniMissingFunction")
-        external fun internalPathIteratorNext(
-            internalPathIterator: Long,
-            points: FloatArray,
-            offset: Int
-        ): Int
-
-        @JvmStatic
-        @Suppress("KotlinJniMissingFunction")
-        external fun internalPathIteratorPeek(internalPathIterator: Long): Int
-
-        @JvmStatic
-        @Suppress("KotlinJniMissingFunction")
-        external fun internalPathIteratorRawSize(internalPathIterator: Long): Int
-
-        @JvmStatic
-        @Suppress("KotlinJniMissingFunction")
-        external fun internalPathIteratorSize(internalPathIterator: Long): Int
     }
 
     /**
@@ -322,3 +290,30 @@ class PathIterator(
         destroyInternalPathIterator(internalPathIterator)
     }
 }
+
+@Suppress("KotlinJniMissingFunction")
+private external fun createInternalPathIterator(
+    path: Path, conicEvaluation: Int, tolerance: Float
+): Long
+
+@Suppress("KotlinJniMissingFunction")
+private external fun destroyInternalPathIterator(internalPathIterator: Long)
+
+@Suppress("KotlinJniMissingFunction")
+private external fun internalPathIteratorHasNext(internalPathIterator: Long): Boolean
+
+@Suppress("KotlinJniMissingFunction")
+private external fun internalPathIteratorNext(
+    internalPathIterator: Long,
+    points: FloatArray,
+    offset: Int
+): Int
+
+@Suppress("KotlinJniMissingFunction")
+private external fun internalPathIteratorPeek(internalPathIterator: Long): Int
+
+@Suppress("KotlinJniMissingFunction")
+private external fun internalPathIteratorRawSize(internalPathIterator: Long): Int
+
+@Suppress("KotlinJniMissingFunction")
+private external fun internalPathIteratorSize(internalPathIterator: Long): Int
