@@ -9,7 +9,7 @@ version = VERSION_NAME
 
 android {
     compileSdk 33
-    ndkVersion '25.0.8775105'
+    ndkVersion '25.1.8937393'
 
     defaultConfig {
         minSdk 21
@@ -42,7 +42,7 @@ android {
 }
 
 dependencies {
-    androidTestImplementation 'androidx.core:core-ktx:1.8.0'
+    androidTestImplementation 'androidx.core:core-ktx:1.9.0'
     androidTestImplementation 'androidx.test:runner:1.4.0'
     androidTestImplementation 'androidx.test:rules:1.4.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
