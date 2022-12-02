@@ -150,7 +150,7 @@ Done command. This optional command indicates that no further segment will be
 found in the path. It typically indicates the end of an iteration over a path
 and can be ignored.
 
-## Handling conic segments
+### Handling conic segments
 
 In some API levels, paths may contain conic curves (weighted quadratics) but the
 `Path` API does not offer a way to add conics to a `Path` object. To work around
