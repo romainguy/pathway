@@ -26,40 +26,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.math.abs
 
-private fun assertPointsEquals(p1: PointF, p2: PointF) {
-    assertEquals(p1.x, p2.x, 1e-6f)
-    assertEquals(p1.y, p2.y, 1e-6f)
-}
-
-private fun assertPointsEquals(p1: FloatArray, offset: Int, p2: PointF) {
-    assertEquals(p1[0 + offset * 2], p2.x, 1e-6f)
-    assertEquals(p1[1 + offset * 2], p2.y, 1e-6f)
-}
-
-private fun compareBitmaps(b1: Bitmap, b2: Bitmap, error: Int = 1) {
-    assertEquals(b1.width, b2.width)
-    assertEquals(b1.height, b2.height)
-
-    val p1 = IntArray(b1.width * b1.height)
-    b1.getPixels(p1, 0, b1.width, 0, 0, b1.width, b1.height)
-
-    val p2 = IntArray(b2.width * b2.height)
-    b2.getPixels(p2, 0, b2.width, 0, 0, b2.width, b2.height)
-
-    for (x in 0 until b1.width) {
-        for (y in 0 until b2.width) {
-            val index = y * b1.width + x
-
-            val c1 = p1[index]
-            val c2 = p2[index]
-
-            assertTrue(abs(Color.red(c1) - Color.red(c2)) <= error)
-            assertTrue(abs(Color.green(c1) - Color.green(c2)) <= error)
-            assertTrue(abs(Color.blue(c1) - Color.blue(c2)) <= error)
-        }
-    }
-}
-
 @RunWith(AndroidJUnit4::class)
 class PathIteratorTest {
     @Test

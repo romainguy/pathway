@@ -1,6 +1,6 @@
 # Pathway
 
-[![pathway](https://maven-badges-generator.herokuapp.com/maven-central/dev.romainguy/pathway/badge.svg?subject=pathway)](https://maven-badges-generator.herokuapp.com/maven-central/dev.romainguy/pathway)
+[![pathway](https://maven-badges.herokuapp.com/maven-central/dev.romainguy/pathway/badge.svg?subject=pathway)](https://maven-badges.herokuapp.com/maven-central/dev.romainguy/pathway)
 [![Android build status](https://github.com/romainguy/pathway/workflows/Android/badge.svg)](https://github.com/romainguy/pathway/actions?query=workflow%3AAndroid)
 
 Pathway is an Android library that provides new functionalities around the graphics
@@ -17,8 +17,46 @@ repositories {
 }
 
 dependencies {
-    implementation 'dev.romainguy:pathway:0.8.0'
+    implementation 'dev.romainguy:pathway:0.9.0'
 }
+```
+
+## Features
+
+- [Paths from images](#paths-from-images)
+- [Path division](#path-division)
+- [Iterating over a Path](#iterating-over-a-path)
+
+## Paths from images
+
+`Bitmap.toPath()` and `Bitmap.toPaths()` can be used to extract vector contours from images, as
+`Path` object. `toPath()` extracts all the contours in a single `Path` while `toPaths()` returns
+a list of contours as separate `Path` instances. Calling `toPaths()` is equivalent to calling
+`toPath().divide()` (see [Path division](#path-division)) but more efficient.
+
+When extracting a path from an image, two parameters can be set:
+- `alphaTreshold`: defines the maximum alpha channel value a pixel might have before being
+  considered opaque. Transitions from opaque to transparent are used to define the contours
+  in the image. The default value is 0.0f (meaning any pixel with an alpha > 0.0 is considered
+  to be inside the contour).
+- `minAngle`: defines the minimum angle in degrees between two segments in the contour before
+  they are collapsed to simplify the final geometry. The default value is 15 degrees. Setting
+  this value to 0 will yield an exact vector representation of the contours but will generate
+  complex and expensive paths.
+
+## Path division
+
+Path division can be used to generate a list of paths from a source path. Each contour, defined
+by a "move" operation, in the source path is extracted as a separate `Path`. In the following
+example the `paths` variable contains a list of 2 `Path` instance, each containing one of the
+rectangles originally added to the source `path`:
+
+```kotlin
+val path = Path().apply {
+    addRect(0.0f, 0.0f, 24.0f, 24.0f)
+    addRect(32.0f, 32.0f, 64.0f, 64.0f)
+}
+val paths = path.divide()
 ```
 
 ## Iterating over a Path
