@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'dev.romainguy:pathway:0.9.0'
+    implementation 'dev.romainguy:pathway:0.10.0'
 }
 ```
 
@@ -25,6 +25,7 @@ dependencies {
 
 - [Paths from images](#paths-from-images)
 - [Path division](#path-division)
+- [Convert to SVG](#convert-to-svg)
 - [Iterating over a Path](#iterating-over-a-path)
 
 ## Paths from images
@@ -58,6 +59,12 @@ val path = Path().apply {
 }
 val paths = path.divide()
 ```
+
+## Convert to SVG
+
+To convert a `Path` to an SVG document, call `Path.toSvg()`. If you only want the path data instead
+of a full SVG document, use `Path.toSvg(document = false)` instead. Exporting a full document will
+properly honor the path's fill type.
 
 ## Iterating over a Path
 
