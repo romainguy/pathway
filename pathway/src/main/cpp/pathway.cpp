@@ -40,14 +40,20 @@ std::once_flag sApiLevelOnceFlag;
 
 static uint32_t api_level() {
     std::call_once(sApiLevelOnceFlag, []() {
-        char sdkVersion[PROP_VALUE_MAX];
-        __system_property_get("ro.build.version.sdk", sdkVersion);
-        sApiLevel = atoi(sdkVersion); // NOLINT(cert-err34-c)
+        char buffer[PROP_VALUE_MAX];
+        __system_property_get("ro.build.version.sdk", buffer);
+        sApiLevel = atoi(buffer); // NOLINT(cert-err34-c)
+
+        // Adapt API level for Developer Preview builds
+        __system_property_get("ro.build.version.release_or_codename", buffer);
+        if (sApiLevel < 34 && !strcmp(buffer, "UpsideDownCake")) {
+            sApiLevel = 34;
+        }
     });
     return sApiLevel;
 }
 
-static jlong createPathIterator(JNIEnv* env, jobject,
+static jlong createPathIterator(JNIEnv* env, jclass,
         jobject path_, jint conicEvaluation_, jfloat tolerance_) {
 
     auto nativePath = static_cast<intptr_t>(env->GetLongField(path_, sPath.nativePath));
@@ -60,7 +66,14 @@ static jlong createPathIterator(JNIEnv* env, jobject,
     PathIterator::VerbDirection direction;
 
     const uint32_t apiLevel = api_level();
-    if (apiLevel >= 30) {
+    if (apiLevel >= 33) {
+        auto* ref = reinterpret_cast<PathRef34*>(path->pathRef);
+        points = ref->points;
+        verbs = ref->verbs;
+        conicWeights = ref->conicWeights;
+        count = ref->verbSize;
+        direction = PathIterator::VerbDirection::Forward;
+    } else if (apiLevel >= 30) {
         auto* ref = reinterpret_cast<PathRef30*>(path->pathRef);
         points = ref->points;
         verbs = ref->verbs;

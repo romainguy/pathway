@@ -8,12 +8,12 @@ group = GROUP
 version = VERSION_NAME
 
 android {
-    compileSdk 33
+    compileSdkPreview 'UpsideDownCake'
     ndkVersion '25.1.8937393'
 
     defaultConfig {
         minSdk 21
-        targetSdk 33
+        targetSdk 34
 
         externalNativeBuild {
             cmake {
@@ -43,9 +43,9 @@ android {
 
 dependencies {
     androidTestImplementation 'androidx.core:core-ktx:1.9.0'
-    androidTestImplementation 'androidx.test:runner:1.5.1'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test:rules:1.5.0'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
 }
 
 apply plugin: "com.vanniktech.maven.publish"

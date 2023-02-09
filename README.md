@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'dev.romainguy:pathway:0.10.0'
+    implementation 'dev.romainguy:pathway:0.11.0'
 }
 ```
 
@@ -67,6 +67,11 @@ of a full SVG document, use `Path.toSvg(document = false)` instead. Exporting a 
 properly honor the path's fill type.
 
 ## Iterating over a Path
+
+> **Note**
+> As of Android 14 (tentatively API 34), iterating over a `Path` can be achieved using the new
+> platform API [getPathIterator()](https://developer.android.com/reference/android/graphics/Path#getPathIterator()).
+> Pathway is however compatible with Android 14, including Developer Preview builds.
 
 With Pathway you can easily iterate over a `Path` object to inspect its segments
 (curves or commands):

@@ -17,6 +17,8 @@
 #ifndef PATHWAY_PATH_H
 #define PATHWAY_PATH_H
 
+#include <cstddef>
+
 #include <stdint.h>
 
 // The following structures declare the minimum we need + a marker (generationId) to
@@ -26,13 +28,13 @@
 // still exist but was moved after the data we need.
 
 enum class Verb : uint8_t {
-    Move,
-    Line,
-    Quadratic,
-    Conic,
-    Cubic,
-    Close,
-    Done
+    Move      = 0,
+    Line      = 1,
+    Quadratic = 2,
+    Conic     = 3,
+    Cubic     = 4,
+    Close     = 5,
+    Done      = 6
 };
 
 struct Point {
@@ -113,6 +115,27 @@ struct PathRef30 {
     __unused int conicWeightsReserve;
     __unused int conicWeightsCount;
     __unused uint32_t generationId;
+};
+
+struct PathRef34 {
+                   __unused int32_t refCount;
+                   __unused float left;
+                   __unused float top;
+                   __unused float right;
+                   __unused float bottom;
+    alignas(Point) __unused std::byte pointStorage[sizeof(Point) * 4];
+                            Point* points;
+                   __unused int pointSize;
+                   __unused uint32_t pointCapacity;
+    alignas(Verb) __unused std::byte verbStorage[sizeof(Verb) * 4];
+                            Verb* verbs;
+                            int verbSize;
+                   __unused int verbCapacity;
+    alignas(float) __unused std::byte conicStorage[sizeof(float) * 2];
+                            float* conicWeights;
+                   __unused int conicWeightsSize;
+                   __unused int conicWeightsCapacity;
+                   __unused uint32_t generationId;
 };
 
 struct Path {
