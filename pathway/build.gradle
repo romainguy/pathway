@@ -10,6 +10,7 @@ version = VERSION_NAME
 android {
     compileSdkPreview 'UpsideDownCake'
     ndkVersion '25.1.8937393'
+    namespace "dev.romainguy.graphics.path"
 
     defaultConfig {
         minSdk 21
