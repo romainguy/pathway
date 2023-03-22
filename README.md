@@ -71,7 +71,9 @@ properly honor the path's fill type.
 > **Note**
 > As of Android 14 (tentatively API 34), iterating over a `Path` can be achieved using the new
 > platform API [getPathIterator()](https://developer.android.com/reference/android/graphics/Path#getPathIterator()).
-> Pathway is however compatible with Android 14, including Developer Preview builds.
+> Pathway is however compatible with Android 14, including Developer Preview builds. You can
+> also use the new androidx
+> [graphics-path library](https://developer.android.com/jetpack/androidx/releases/graphics#graphics-path-1.0.0-alpha01).
 
 With Pathway you can easily iterate over a `Path` object to inspect its segments
 (curves or commands):
