@@ -59,6 +59,16 @@ fun compareBitmaps(b1: Bitmap, b2: Bitmap, error: Int = 1) {
     }
 }
 
+fun valueCountForType(type: PathSegment.Type) = when(type) {
+    PathSegment.Type.Move -> 2
+    PathSegment.Type.Line -> 4
+    PathSegment.Type.Quadratic -> 6
+    PathSegment.Type.Conic -> 8
+    PathSegment.Type.Cubic -> 8
+    PathSegment.Type.Close -> 0
+    PathSegment.Type.Done -> 0
+}
+
 fun assertPathEquals(
     expected: Path,
     actual: Path,
@@ -73,7 +83,12 @@ fun assertPathEquals(
     while (iterator1.hasNext() && iterator2.hasNext()) {
         val type1 = iterator1.next(points1)
         val type2 = iterator2.next(points2)
+
+        points1.fill(0.0f, valueCountForType(type1))
+        points2.fill(0.0f, valueCountForType(type2))
+
         assertEquals(type1, type2)
+
         Assert.assertArrayEquals(points1, points2, 1e-10f)
     }
 }

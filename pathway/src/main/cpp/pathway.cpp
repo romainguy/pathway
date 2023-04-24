@@ -66,7 +66,7 @@ static jlong createPathIterator(JNIEnv* env, jclass,
     PathIterator::VerbDirection direction;
 
     const uint32_t apiLevel = api_level();
-    if (apiLevel >= 33) {
+    if (apiLevel >= 34) {
         auto* ref = reinterpret_cast<PathRef34*>(path->pathRef);
         points = ref->points;
         verbs = ref->verbs;

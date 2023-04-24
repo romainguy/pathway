@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'dev.romainguy:pathway:0.11.0'
+    implementation 'dev.romainguy:pathway:0.12.0'
 }
 ```
 
