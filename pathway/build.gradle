@@ -10,7 +10,7 @@ version = VERSION_NAME
 android {
     namespace "dev.romainguy.graphics.path"
 
-    compileSdkVersion 34
+    compileSdk 34
     ndkVersion '25.1.8937393'
 
     defaultConfig {
