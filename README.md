@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'dev.romainguy:pathway:0.12.0'
+    implementation 'dev.romainguy:pathway:0.14.0'
 }
 ```
 
@@ -69,11 +69,10 @@ properly honor the path's fill type.
 ## Iterating over a Path
 
 > **Note**
-> As of Android 14 (tentatively API 34), iterating over a `Path` can be achieved using the new
+> As of Android 14 (API 34), iterating over a `Path` can be achieved using the new
 > platform API [getPathIterator()](https://developer.android.com/reference/android/graphics/Path#getPathIterator()).
-> Pathway is however compatible with Android 14, including Developer Preview builds. You can
-> also use the new androidx
-> [graphics-path library](https://developer.android.com/jetpack/androidx/releases/graphics#graphics-path-1.0.0-alpha01).
+> Pathway is however compatible with Android 14. You can also use the new androidx
+> [graphics-path library](https://developer.android.com/jetpack/androidx/releases/graphics#graphics-path-1.0.0-alpha02).
 
 With Pathway you can easily iterate over a `Path` object to inspect its segments
 (curves or commands):
