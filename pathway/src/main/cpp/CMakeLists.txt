@@ -9,12 +9,9 @@ add_library(
     pathway.cpp
 )
 
-find_library(
-    log-lib
-    log
-)
-
-target_link_libraries(
+set(VERSION_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/libpathway.map")
+target_link_options(
     pathway
-    ${log-lib}
+    PRIVATE
+    "-Wl,--version-script=${VERSION_SCRIPT}"
 )

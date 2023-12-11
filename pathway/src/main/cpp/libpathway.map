@@ -1,0 +1,6 @@
+LIBPATHWAY {
+    global:
+        JNI_OnLoad;
+    local:
+        *;
+};

@@ -18,40 +18,14 @@
 
 #include <jni.h>
 
-#include <sys/system_properties.h>
-
-#include <mutex>
+#include <android/api-level.h>
 
 #define JNI_CLASS_NAME "dev/romainguy/graphics/path/Paths"
-
-#if !defined(NDEBUG)
-#include <android/log.h>
-#define ANDROID_LOG_TAG "PathIterator"
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, ANDROID_LOG_TAG, __VA_ARGS__)
-#endif
 
 struct {
     jclass jniClass;
     jfieldID nativePath;
 } sPath{};
-
-uint32_t sApiLevel = 0;
-std::once_flag sApiLevelOnceFlag;
-
-static uint32_t api_level() {
-    std::call_once(sApiLevelOnceFlag, []() {
-        char buffer[PROP_VALUE_MAX];
-        __system_property_get("ro.build.version.sdk", buffer);
-        sApiLevel = atoi(buffer); // NOLINT(cert-err34-c)
-
-        // Adapt API level for Developer Preview builds
-        __system_property_get("ro.build.version.release_or_codename", buffer);
-        if (sApiLevel < 34 && !strcmp(buffer, "UpsideDownCake")) {
-            sApiLevel = 34;
-        }
-    });
-    return sApiLevel;
-}
 
 static jlong createPathIterator(JNIEnv* env, jclass,
         jobject path_, jint conicEvaluation_, jfloat tolerance_) {
@@ -65,7 +39,7 @@ static jlong createPathIterator(JNIEnv* env, jclass,
     int count;
     PathIterator::VerbDirection direction;
 
-    const uint32_t apiLevel = api_level();
+    const uint32_t apiLevel = android_get_device_api_level();
     if (apiLevel >= 34) {
         auto* ref = reinterpret_cast<PathRef34*>(path->pathRef);
         points = ref->points;
