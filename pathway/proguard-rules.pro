@@ -1,3 +1,3 @@
--keepclasseswithmembernames,includedescriptorclasses class dev.romainguy.graphics.path.** {
+-keepclasseswithmembers class dev.romainguy.graphics.path.** {
     native <methods>;
 }
