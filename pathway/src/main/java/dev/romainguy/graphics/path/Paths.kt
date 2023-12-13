@@ -103,9 +103,7 @@ class PathSegment internal constructor(val type: Type, val points: Array<PointF>
 
         if (type != other.type) return false
         if (!points.contentEquals(other.points)) return false
-        if (weight != other.weight) return false
-
-        return true
+        return weight == other.weight
     }
 
     override fun hashCode(): Int {
@@ -129,11 +127,6 @@ val DoneSegment = PathSegment(PathSegment.Type.Done, emptyArray(), 0.0f)
  * A [PathSegment] containing the [Close][PathSegment.Type.Close] command.
  */
 val CloseSegment = PathSegment(PathSegment.Type.Close, emptyArray(), 0.0f)
-
-/**
- * Cache of [PathSegment.Type] values to avoid internal allocation on each use.
- */
-private val pathSegmentTypes = PathSegment.Type.values()
 
 /**
  * Creates a new [PathIterator] for this [path][android.graphics.Path] that evaluates
@@ -211,7 +204,7 @@ class PathIterator(
      * Returns the type of the current segment in the iteration, or [Done][PathSegment.Type.Done]
      * if the iteration is finished.
      */
-    fun peek() = pathSegmentTypes[internalPathIteratorPeek(internalPathIterator)]
+    fun peek() = PathSegment.Type.entries[internalPathIteratorPeek(internalPathIterator)]
 
     /**
      * Returns the [type][PathSegment.Type] of the next [path segment][PathSegment] in the iteration
@@ -236,7 +229,7 @@ class PathIterator(
     fun next(points: FloatArray, offset: Int = 0): PathSegment.Type {
         check(points.size - offset >= 8) { "The points array must contain at least 8 floats" }
         val typeValue = internalPathIteratorNext(internalPathIterator, points, offset)
-        return pathSegmentTypes[typeValue]
+        return PathSegment.Type.entries[typeValue]
     }
 
     /**
@@ -246,7 +239,7 @@ class PathIterator(
      */
     override fun next(): PathSegment {
         val typeValue = internalPathIteratorNext(internalPathIterator, pointsData, 0)
-        val type = pathSegmentTypes[typeValue]
+        val type = PathSegment.Type.entries[typeValue]
 
         if (type == PathSegment.Type.Done) return DoneSegment
         if (type == PathSegment.Type.Close) return CloseSegment
@@ -255,12 +248,14 @@ class PathIterator(
             PathSegment.Type.Move -> {
                 arrayOf(PointF(pointsData[0], pointsData[1]))
             }
+
             PathSegment.Type.Line -> {
                 arrayOf(
                     PointF(pointsData[0], pointsData[1]),
                     PointF(pointsData[2], pointsData[3])
                 )
             }
+
             PathSegment.Type.Quadratic,
             PathSegment.Type.Conic -> {
                 arrayOf(
@@ -269,6 +264,7 @@ class PathIterator(
                     PointF(pointsData[4], pointsData[5])
                 )
             }
+
             PathSegment.Type.Cubic -> {
                 arrayOf(
                     PointF(pointsData[0], pointsData[1]),
@@ -291,29 +287,22 @@ class PathIterator(
     }
 }
 
-@Suppress("KotlinJniMissingFunction")
 private external fun createInternalPathIterator(
     path: Path, conicEvaluation: Int, tolerance: Float
 ): Long
 
-@Suppress("KotlinJniMissingFunction")
 private external fun destroyInternalPathIterator(internalPathIterator: Long)
 
-@Suppress("KotlinJniMissingFunction")
 private external fun internalPathIteratorHasNext(internalPathIterator: Long): Boolean
 
-@Suppress("KotlinJniMissingFunction")
 private external fun internalPathIteratorNext(
     internalPathIterator: Long,
     points: FloatArray,
     offset: Int
 ): Int
 
-@Suppress("KotlinJniMissingFunction")
 private external fun internalPathIteratorPeek(internalPathIterator: Long): Int
 
-@Suppress("KotlinJniMissingFunction")
 private external fun internalPathIteratorRawSize(internalPathIterator: Long): Int
 
-@Suppress("KotlinJniMissingFunction")
 private external fun internalPathIteratorSize(internalPathIterator: Long): Int

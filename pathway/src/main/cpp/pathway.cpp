@@ -20,6 +20,9 @@
 
 #include <android/api-level.h>
 
+#include <cstdlib>
+#include <new>
+
 #define JNI_CLASS_NAME "dev/romainguy/graphics/path/Paths"
 
 struct {
@@ -77,14 +80,17 @@ static jlong createPathIterator(JNIEnv* env, jclass,
         direction = PathIterator::VerbDirection::Backward;
     }
 
-    return jlong(new PathIterator(
+    PathIterator* iterator = static_cast<PathIterator*>(malloc(sizeof(PathIterator)));
+    return jlong(new(iterator) PathIterator(
             points, verbs, conicWeights, count, direction,
             PathIterator::ConicEvaluation(conicEvaluation_), tolerance_
     ));
 }
 
 static void destroyPathIterator(JNIEnv*, jclass, jlong pathIterator_) {
-    delete reinterpret_cast<PathIterator*>(pathIterator_);
+    PathIterator* iterator = reinterpret_cast<PathIterator*>(pathIterator_);
+    iterator->~PathIterator();
+    free(iterator);
 }
 
 static jboolean pathIteratorHasNext(JNIEnv*, jclass, jlong pathIterator_) {
