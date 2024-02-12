@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'dev.romainguy:pathway:0.17.0'
+    implementation 'dev.romainguy:pathway:0.18.0'
 }
 ```
 
@@ -69,7 +69,7 @@ properly honor the path's fill type.
 ## Iterating over a Path
 
 > [!IMPORTANT]
-> It is preferred to use the new androidx
+> Prefer the new androidx
 > [graphics-path library](https://developer.android.com/jetpack/androidx/releases/graphic) to
 > iterate over paths
 
