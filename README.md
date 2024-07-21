@@ -70,7 +70,7 @@ properly honor the path's fill type.
 
 > [!IMPORTANT]
 > Prefer the new androidx
-> [graphics-path library](https://developer.android.com/jetpack/androidx/releases/graphic) to
+> [graphics-path library](https://developer.android.com/reference/kotlin/androidx/graphics/path/package-summary) to
 > iterate over paths
 
 > [!NOTE]
