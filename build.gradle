@@ -5,10 +5,10 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.2'
-        classpath "com.vanniktech:gradle-maven-publish-plugin:0.25.3"
+        classpath 'com.android.tools.build:gradle:8.10.0'
+        classpath "com.vanniktech:gradle-maven-publish-plugin:0.31.0"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.21"
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.8.20"
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:2.0.0"
     }
 
     ext.cppFlags = [

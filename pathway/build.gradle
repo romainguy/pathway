@@ -1,3 +1,5 @@
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
@@ -10,12 +12,12 @@ version = VERSION_NAME
 android {
     namespace "dev.romainguy.graphics.path"
 
-    compileSdk 34
-    ndkVersion '26.2.11394342'
+    compileSdk 36
+    ndkVersion '28.1.13356709'
 
     defaultConfig {
         minSdk 21
-        targetSdk 34
+        targetSdk 36
 
         ndk {
             //noinspection ChromeOsAbiSupport
@@ -33,27 +35,32 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '21'
     }
 
     externalNativeBuild {
         cmake {
             path file('src/main/cpp/CMakeLists.txt')
-            version '3.22.1'
+            version '3.31.6'
         }
     }
 }
 
 dependencies {
-    androidTestImplementation 'androidx.core:core-ktx:1.12.0'
-    androidTestImplementation 'androidx.test:runner:1.5.2'
-    androidTestImplementation 'androidx.test:rules:1.5.0'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.core:core-ktx:1.16.0'
+    androidTestImplementation 'androidx.test:runner:1.6.2'
+    androidTestImplementation 'androidx.test:rules:1.6.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
 }
 
 apply plugin: "com.vanniktech.maven.publish"
+
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    signAllPublications()
+}
